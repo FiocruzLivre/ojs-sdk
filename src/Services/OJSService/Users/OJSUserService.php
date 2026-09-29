@@ -2,9 +2,11 @@
 
 namespace OjsSdk\Services\OJSService\Users;
 
+use APP\facades\Repo;
 use GuzzleHttp\Cookie\CookieJar;
-use DAORegistry;
 use OjsSdk\Providers\Ojs\OjsProvider;
+use PKP\core\Core;
+use PKP\security\Validation;
 
 class OJSUserService
 {
@@ -78,26 +80,28 @@ class OJSUserService
     {
         try {
             OjsProvider::getApplication();
-            /** @var UserDAO */
-            $userDao = DAORegistry::getDAO('UserDAO');
-            $user = $userDao->getUserByEmail($data['email']);
+            $user = Repo::user()->getByEmail($data['email']);
             if (is_null($user)) {
-                $user = $userDao->newDataObject();
+                $user = Repo::user()->newDataObject();
                 $user->setAllData($data);
-                $user->setPassword(\Validation::encryptCredentials($user->getUsername(), $data['password']));
-                $userId = $userDao->insertObject($user);
-                /** @var UserGroupDAO */
-                $userGroupDao = DAORegistry::getDAO('UserGroupDAO');
+                // setAllData() replaces the entire data array wholesale, but the schema's
+                // property is "userName" (camelCase), not the "username" key this API takes -
+                // without this, the username is silently dropped and never reaches the DB.
+                $user->setUsername($data['username']);
+                $user->setPassword(Validation::encryptCredentials($user->getUsername(), $data['password']));
+                $user->setDateRegistered(Core::getCurrentDate());
+                $userId = Repo::user()->add($user);
                 foreach ($data['groups'] as $groupId) {
-                    if (!$userGroupDao->userInGroup($userId, $groupId)) {
-                        $userGroupDao->assignUserToGroup($userId, $groupId);
+                    if (!Repo::userGroup()->userInGroup($userId, $groupId)) {
+                        Repo::userGroup()->assignUserToGroup($userId, $groupId);
                     }
                 }
             } else {
                 $id = $user->getId();
                 $user->setAllData($data);
+                $user->setUsername($data['username']);
                 $user->setId($id);
-                $userDao->updateObject($user);
+                Repo::user()->edit($user, []);
             }
         } catch (\Exception $e) {
             throw new \Exception("Error creating OJS user: $e");
@@ -108,19 +112,17 @@ class OJSUserService
     public function changePassword(string $email, string $password)
     {
         OjsProvider::getApplication();
-        $userDao = DAORegistry::getDAO('UserDAO');
-        $user = $userDao->getUserByEmail($email);
+        $user = Repo::user()->getByEmail($email);
         if ($user) {
-            $user->setPassword(\Validation::encryptCredentials($user->getUsername(), $password));
-            $userDao->updateObject($user);
+            $user->setPassword(Validation::encryptCredentials($user->getUsername(), $password));
+            Repo::user()->edit($user, []);
         }
     }
     public function getUniqueUsername(string $username)
     {
         OjsProvider::getApplication();
-        $userDao = DAORegistry::getDAO('UserDAO');
         $i = '';
-        while ($userDao->userExistsByUsername($username . $i)) {
+        while (Repo::user()->getByUsername($username . $i)) {
             if ($i === '') {
                 $i = 0;
             } else {
