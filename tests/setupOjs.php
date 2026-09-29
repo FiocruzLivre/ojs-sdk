@@ -13,7 +13,7 @@ set_include_path(getenv('OJS_WEB_BASEDIR') . PATH_SEPARATOR . get_include_path()
 copy(getenv('OJS_WEB_BASEDIR').'/config.TEMPLATE.inc.php', getenv('OJS_WEB_BASEDIR').'/config.inc.php');
 require('tools/bootstrap.inc.php');
 
-import('lib.pkp.classes.cliTool.InstallTool');
+use PKP\cliTool\InstallTool;
 
 class OJSInstallTest extends InstallTool {
     /**
@@ -31,9 +31,7 @@ $params = [
     'additionalLocales' => [
         'en_US'
     ],
-    'clientCharset' => 'utf-8',
-    'connectionCharset' => 'utf8',
-    'databaseCharset' => 'utf8',
+    'timeZone' => 'UTC',
     'filesDir' => '/app/ojs/',
     'adminUsername' => 'admin',
     'adminPassword' => 'admin',
