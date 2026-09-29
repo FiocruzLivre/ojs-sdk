@@ -2,12 +2,17 @@
 
 namespace OjsSdk\Providers\Ojs;
 
-use PluginRegistry;
+use APP\core\Application;
+use APP\core\PageRouter;
+use PKP\config\Config;
+use PKP\core\Registry;
+use PKP\plugins\Hook;
+use PKP\plugins\PluginRegistry;
 
 class OjsProvider
 {
     /**
-     * @return \Application
+     * @return Application
      */
     public static function getApplication(string $journal = '')
     {
@@ -25,36 +30,28 @@ class OjsProvider
         $currentDirectory = getcwd();
         chdir(BASE_SYS_DIR);
 
-        // Update include path - for backwards compatibility only
-        // Try to use absolute (/...) or relative (./...) filenames
-        // wherever possible to bypass the costly file name normalization
-        // process.
-        ini_set(
-            'include_path',
-            ENV_SEPARATOR . BASE_SYS_DIR
-            . ENV_SEPARATOR . BASE_SYS_DIR . '/classes'
-            . ENV_SEPARATOR . BASE_SYS_DIR . '/pages'
-            . ENV_SEPARATOR . BASE_SYS_DIR . '/lib/pkp'
-            . ENV_SEPARATOR . BASE_SYS_DIR . '/lib/pkp/classes'
-            . ENV_SEPARATOR . BASE_SYS_DIR . '/lib/pkp/pages'
-            . ENV_SEPARATOR . BASE_SYS_DIR . '/lib/pkp/lib/adodb'
-            . ENV_SEPARATOR . ini_get('include_path')
-        );
-        // System-wide functions
-        require('includes/functions.inc.php');
+        $baseDir = getenv('OJS_WEB_BASEDIR');
+        if (!$baseDir) {
+            throw new \Exception('OJS_WEB_BASEDIR environment variable is not set');
+        }
 
-        // Initialize the application environment
-        import('classes.core.Application');
-        $application = new \Application();
-        import('lib.pkp.classes.core.PKPRequest');
-        import('lib.pkp.classes.core.PKPRouter');
-        import('lib.pkp.classes.core.Registry');
-        $request = new \PKPRequest();
-        $router = new \PKPRouter();
-        $router->setApplication($application);
-        $request->setRouter($router);
-        \Registry::set('request', $request);
-        \AppLocale::$request = \Registry::get('request', true, null);
+        // Load the Composer autoloader (required for 3.4+; there is no more import()/include_path bootstrap)
+        require_once $baseDir . '/lib/pkp/lib/vendor/autoload.php';
+        define('PKP_STRICT_MODE', (bool) Config::getVar('general', 'strict'));
+
+        // Initialize the Application
+        $application = Application::get();
+
+        // A CLI-bootstrapped Request has no Router yet (nothing set one via an HTTP front
+        // controller) - PKPRouter is abstract in 3.4, so it must be a concrete PageRouter.
+        if ($application) {
+            $request = $application->getRequest();
+            $router = new PageRouter();
+            $router->setApplication($application);
+            $request->setRouter($router);
+            Registry::set('request', $request);
+        }
+
         self::setJournal($journal);
         PluginRegistry::loadCategory('generic', true);
         PluginRegistry::loadCategory('pubIds', true);
@@ -62,13 +59,13 @@ class OjsProvider
         return $application;
     }
 
-    private static function setJournal($journal)
+    private static function setJournal(string $journal)
     {
-        $configData = \Registry::get('configData');
+        $configData = Registry::get('configData');
         $configData['general']['disable_path_info'] = true;
-        \Registry::set('configData', $configData);
-        import('lib.pkp.classes.plugins.HookRegistry');
-        \HookRegistry::register('Request::getQueryString', function ($hook, &$args) use ($journal) {
+        Registry::set('configData', $configData);
+
+        Hook::add('Request::getQueryString', function ($hookName, &$args) use ($journal) {
             $args[0] = ($args[0] ? $args[0] . '&' : '') . 'journal=' . $journal;
         });
     }

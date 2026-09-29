@@ -6,12 +6,13 @@ chdir(getenv('OJS_WEB_BASEDIR'));
 
 require_once './lib/pkp/tests/phpunit-bootstrap.php';
 
-import('lib.pkp.classes.core.PKPRequest');
-import('lib.pkp.classes.core.PKPRouter');
-import('lib.pkp.classes.core.Registry');
-$request = new \PKPRequest();
-$router = new \PKPRouter();
-$router->setApplication(\PKPApplication::get());
+use APP\core\Application;
+use APP\core\PageRouter;
+use PKP\core\Registry;
+
+$application = Application::get();
+$request = $application->getRequest();
+$router = new PageRouter();
+$router->setApplication($application);
 $request->setRouter($router);
-\Registry::set('request', $request);
-\AppLocale::$request = \Registry::get('request', true, null);
+Registry::set('request', $request);
