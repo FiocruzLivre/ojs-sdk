@@ -10,7 +10,7 @@ services:
       - .env
     environment:
       XDEBUG_CONFIG: "remote_host=172.17.0.1 remote_enable=1"
-      OJS_VERSION: stable-3_1_2
+      OJS_VERSION: 3_4_0-10
     depends_on:
       - db
     links:

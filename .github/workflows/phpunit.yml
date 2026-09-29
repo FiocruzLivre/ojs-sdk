@@ -16,9 +16,9 @@ jobs:
       # do not stop on another job's failure
       fail-fast: false
       matrix:
-        php-versions: ['7.4']
+        php-versions: ['8.2']
         databases: ['mysql']
-        server-versions: ['3_2_1-1']
+        server-versions: ['3_4_0-10']
     name: php${{ matrix.php-versions }}-${{ matrix.databases }}-${{ matrix.server-versions }}
     services:
       mysql:
@@ -66,8 +66,8 @@ jobs:
       # do not stop on another job's failure
       fail-fast: false
       matrix:
-        php-versions: ['7.4']
-        server-versions: ['3_2_1-1']
+        php-versions: ['8.2']
+        server-versions: ['3_4_0-10']
 
     name: php-cs check php${{ matrix.php-versions }}
 

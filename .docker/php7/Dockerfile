@@ -1,4 +1,4 @@
-FROM php:7.4-fpm
+FROM php:8.2-fpm
 
 RUN apt-get update
 
@@ -15,7 +15,7 @@ RUN apt-get install -y \
     && docker-php-ext-install pdo pdo_mysql mysqli \
     && docker-php-ext-install zip
 
-RUN pecl install xdebug-2.9.8 \
+RUN pecl install xdebug-3.2.2 \
     && docker-php-ext-enable xdebug
 
 RUN curl https://getcomposer.org/composer.phar --output /usr/bin/composer
