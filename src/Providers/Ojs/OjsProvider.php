@@ -35,22 +35,30 @@ class OjsProvider
             throw new \Exception('OJS_WEB_BASEDIR environment variable is not set');
         }
 
-        // Load the Composer autoloader (required for 3.4+; there is no more import()/include_path bootstrap)
+        // Same two requires OJS's own lib/pkp/includes/bootstrap.php does. The autoloader
+        // alone isn't enough: functions.php defines global helpers (e.g. strtolower_codesafe)
+        // that PKP\db\DAO and others call unqualified, expecting them to already exist.
         require_once $baseDir . '/lib/pkp/lib/vendor/autoload.php';
+        require_once $baseDir . '/lib/pkp/includes/functions.php';
         define('PKP_STRICT_MODE', (bool) Config::getVar('general', 'strict'));
 
-        // Initialize the Application
+        // Application::get() is a plain Registry read with no lazy construction - unlike
+        // an HTTP request (where index.php constructs one), a bare CLI process has nothing
+        // that ever does that, so it returns null here unless something already has. The
+        // Application constructor registers itself (Registry::set('application', $this)),
+        // which is what the old 3.3 code's "new \Application()" relied on too.
         $application = Application::get();
+        if (!$application) {
+            $application = new Application();
+        }
 
         // A CLI-bootstrapped Request has no Router yet (nothing set one via an HTTP front
         // controller) - PKPRouter is abstract in 3.4, so it must be a concrete PageRouter.
-        if ($application) {
-            $request = $application->getRequest();
-            $router = new PageRouter();
-            $router->setApplication($application);
-            $request->setRouter($router);
-            Registry::set('request', $request);
-        }
+        $request = $application->getRequest();
+        $router = new PageRouter();
+        $router->setApplication($application);
+        $request->setRouter($router);
+        Registry::set('request', $request);
 
         self::setJournal($journal);
         PluginRegistry::loadCategory('generic', true);
