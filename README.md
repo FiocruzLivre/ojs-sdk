@@ -1,8 +1,10 @@
-![Test Status](https://github.com/librecodecoop/ojs-sdk/workflows/ci/badge.svg?branch=main)
+![Test Status](https://github.com/FiocruzLivre/ojs-sdk/workflows/ci/badge.svg?branch=main)
 
 # OJS-SDK
 
 SDK package for the [OJS](https://pkp.sfu.ca/ojs/)
+
+Requires PHP 8.0+ and OJS 3.4+ (as of v0.2.0 - earlier releases targeted OJS 3.3 and do not work against 3.4).
 
 ## Install
 
@@ -16,7 +18,7 @@ OJS installed in the same server is necessary. Inform the path of OJS for all de
 
 | Environment     | Suggested value                                 | Usage                                     |
 | --------------- | ----------------------------------------------- | ----------------------------------------- |
-| OJS_VERSION     | 3_2_1-1                                         | Setup development environment with Docker |
+| OJS_VERSION     | 3_4_0-10                                        | Setup development environment with Docker |
 | DB_PASSWD       | root                                            | Setup development environment with Docker |
 | OJS_WEB_BASEDIR | /app/ojs                                        | For make all                              |
 | OJS_LOGIN_URL   | http://localhost/ojs/index.php/journal/login/signIn | Only for login                            |
@@ -47,7 +49,7 @@ $return = $OjsClient->createUpdateUser([
 use OjsSdk\Services\OJSService\Users\OJSUserService;
 
 $OjsClient = new OJSUserService();
-$OjsClient->changePassword('jhonusername', '123password');
+$OjsClient->changePassword('jhon.doe@test.coop', '123password');
 ```
 * getUniqueUsername
 
@@ -55,7 +57,7 @@ $OjsClient->changePassword('jhonusername', '123password');
 use OjsSdk\Services\OJSService\Users\OJSUserService;
 
 $OjsClient = new OJSUserService();
-$uniqueUsername = $OjsClient->getUniqueUsername('jhonusername', '123password');
+$uniqueUsername = $OjsClient->getUniqueUsername('jhonusername');
 ```
 
 * Login
@@ -67,7 +69,7 @@ $OjsClient = new OJSUserService();
 $loginResponse = $OjsClient->login('jhonusername', '123password');
 ```
 
-### Make anyfing
+### Make anything
 
 The method `OjsProvider::getApplication();` make all necessary to use all classes of OJS.
 
