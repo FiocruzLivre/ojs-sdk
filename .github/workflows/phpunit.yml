@@ -9,7 +9,7 @@ env:
   OJS_WEB_BASEDIR: /home/runner/work/ojs-sdk/ojs-sdk/ojs/
   OJS_LOGIN_URL: http://localhost/ojs/index.php/journal/login/signIn
   TEST_DB_HOST: 127.0.0.1
-  TEST_DB_PORT: 4444
+  TEST_DB_PORT: 3306
 
 jobs:
   phpunit:
@@ -26,7 +26,7 @@ jobs:
       mysql:
         image: mariadb:10.11
         ports:
-          - 4444:3306/tcp
+          - 3306:3306/tcp
         env:
           MYSQL_ROOT_PASSWORD: root
           MYSQL_DATABASE: ojs
