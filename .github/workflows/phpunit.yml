@@ -29,6 +29,7 @@ jobs:
           - 4444:3306/tcp
         env:
           MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: ojs
         options: --health-cmd="mysqladmin ping" --health-interval 5s --health-timeout 5s --health-retries 10 --health-start-period 30s
 
     steps:
