@@ -8,6 +8,8 @@ on:
 env:
   OJS_WEB_BASEDIR: /home/runner/work/ojs-sdk/ojs-sdk/ojs/
   OJS_LOGIN_URL: http://localhost/ojs/index.php/journal/login/signIn
+  TEST_DB_HOST: 127.0.0.1
+  TEST_DB_PORT: 4444
 
 jobs:
   phpunit:
