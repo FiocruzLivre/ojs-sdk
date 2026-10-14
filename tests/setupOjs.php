@@ -13,7 +13,12 @@ set_include_path(getenv('OJS_WEB_BASEDIR') . PATH_SEPARATOR . get_include_path()
 copy(getenv('OJS_WEB_BASEDIR').'/config.TEMPLATE.inc.php', getenv('OJS_WEB_BASEDIR').'/config.inc.php');
 require('tools/bootstrap.php');
 
+use APP\core\Application;
+use APP\core\Services;
+use APP\facades\Repo;
+use APP\journal\Journal;
 use PKP\cliTool\InstallTool;
+use PKP\core\Registry;
 
 class OJSInstallTest extends InstallTool {
     /**
@@ -51,3 +56,21 @@ $params = [
 
 $tool = new OJSInstallTest($params);
 $tool->install();
+
+// The installer only sets up the site itself - it does not create a journal.
+// Tests need a default context (and its default manager user group), so
+// create one here, the same way the admin UI's "create journal" wizard does.
+$request = Application::get()->getRequest();
+Registry::set('user', Repo::user()->getByUsername($params['adminUsername']));
+
+$journal = new Journal();
+$journal->setData('urlPath', 'test');
+$journal->setData('primaryLocale', 'en_US');
+$journal->setData('supportedLocales', ['en_US']);
+$journal->setData('supportedFormLocales', ['en_US']);
+$journal->setData('supportedSubmissionLocales', ['en_US']);
+$journal->setData('name', 'Test Journal', 'en_US');
+$journal->setData('contactName', 'Admin');
+$journal->setData('contactEmail', $params['adminEmail']);
+
+Services::get('context')->add($journal, $request);
