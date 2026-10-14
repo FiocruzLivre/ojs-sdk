@@ -11,7 +11,7 @@ if (file_exists(getenv('OJS_WEB_BASEDIR') . '/config.inc.php')) {
 set_include_path(getenv('OJS_WEB_BASEDIR') . PATH_SEPARATOR . get_include_path() );
 
 copy(getenv('OJS_WEB_BASEDIR').'/config.TEMPLATE.inc.php', getenv('OJS_WEB_BASEDIR').'/config.inc.php');
-require('tools/bootstrap.inc.php');
+require('tools/bootstrap.php');
 
 use PKP\cliTool\InstallTool;
 
