@@ -32,7 +32,7 @@ $params = [
         'en_US'
     ],
     'timeZone' => 'UTC',
-    'filesDir' => '/app/ojs/',
+    'filesDir' => getenv('OJS_WEB_BASEDIR'),
     'adminUsername' => 'admin',
     'adminPassword' => 'admin',
     'adminPassword2' => 'admin',
