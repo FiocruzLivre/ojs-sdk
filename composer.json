@@ -22,15 +22,17 @@
     },
     "require-dev": {
         "guzzlehttp/guzzle": "^7.0",
-        "squizlabs/php_codesniffer": "^3.13.6"
+        "squizlabs/php_codesniffer": "^3.13.6",
+        "phpstan/phpstan": "^2.3"
     },
     "scripts": {
         "unit": "php ojs/lib/pkp/lib/vendor/phpunit/phpunit/phpunit",
         "cs:check" : "phpcs --standard=PSR12 -n src",
         "cs:fix" : "phpcbf --standard=PSR12 -n src",
+        "phpstan": "phpstan analyse --no-progress --memory-limit=1G",
         "test" : [
             "@unit",
-            "@phpcs"
+            "@cs:check"
         ]
     },
     "autoload": {

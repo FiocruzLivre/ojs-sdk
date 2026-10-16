@@ -1,0 +1,235 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Access to constant DEBUG on an unknown class Monolog\\Logger\.$#'
+			identifier: class.notFound
+			count: 2
+			path: src/Providers/LogProvider.php
+
+		-
+			message: '#^Call to method pushHandler\(\) on an unknown class Monolog\\Logger\.$#'
+			identifier: class.notFound
+			count: 2
+			path: src/Providers/LogProvider.php
+
+		-
+			message: '#^Call to method registerErrorHandler\(\) on an unknown class Monolog\\ErrorHandler\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Providers/LogProvider.php
+
+		-
+			message: '#^Call to method registerExceptionHandler\(\) on an unknown class Monolog\\ErrorHandler\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Providers/LogProvider.php
+
+		-
+			message: '#^Call to method registerFatalHandler\(\) on an unknown class Monolog\\ErrorHandler\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Providers/LogProvider.php
+
+		-
+			message: '#^Call to method setFrom\(\) on an unknown class Swift_Message\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Providers/LogProvider.php
+
+		-
+			message: '#^Call to method setPassword\(\) on an unknown class Swift_SmtpTransport\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Providers/LogProvider.php
+
+		-
+			message: '#^Call to method setTo\(\) on an unknown class Swift_Message\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Providers/LogProvider.php
+
+		-
+			message: '#^Call to method setUsername\(\) on an unknown class Swift_SmtpTransport\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Providers/LogProvider.php
+
+		-
+			message: '#^Instantiated class Monolog\\ErrorHandler not found\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Providers/LogProvider.php
+
+		-
+			message: '#^Instantiated class Monolog\\Handler\\StreamHandler not found\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Providers/LogProvider.php
+
+		-
+			message: '#^Instantiated class Monolog\\Handler\\SwiftMailerHandler not found\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Providers/LogProvider.php
+
+		-
+			message: '#^Instantiated class Monolog\\Logger not found\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Providers/LogProvider.php
+
+		-
+			message: '#^Instantiated class Swift_Mailer not found\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Providers/LogProvider.php
+
+		-
+			message: '#^Instantiated class Swift_Message not found\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Providers/LogProvider.php
+
+		-
+			message: '#^Instantiated class Swift_SmtpTransport not found\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Providers/LogProvider.php
+
+		-
+			message: '#^Method OjsSdk\\Providers\\LogProvider\:\:getLogger\(\) has invalid return type Monolog\\Logger\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Providers/LogProvider.php
+
+		-
+			message: '#^Property OjsSdk\\Providers\\LogProvider\:\:\$logger has unknown class Monolog\\Logger as its type\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Providers/LogProvider.php
+
+		-
+			message: '#^Call to method setApplication\(\) on an unknown class APP\\core\\PageRouter\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Providers/Ojs/OjsProvider.php
+
+		-
+			message: '#^Call to static method add\(\) on an unknown class PKP\\plugins\\Hook\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Providers/Ojs/OjsProvider.php
+
+		-
+			message: '#^Call to static method get\(\) on an unknown class APP\\core\\Application\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Providers/Ojs/OjsProvider.php
+
+		-
+			message: '#^Call to static method get\(\) on an unknown class PKP\\core\\Registry\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Providers/Ojs/OjsProvider.php
+
+		-
+			message: '#^Call to static method getVar\(\) on an unknown class PKP\\config\\Config\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Providers/Ojs/OjsProvider.php
+
+		-
+			message: '#^Call to static method loadCategory\(\) on an unknown class PKP\\plugins\\PluginRegistry\.$#'
+			identifier: class.notFound
+			count: 2
+			path: src/Providers/Ojs/OjsProvider.php
+
+		-
+			message: '#^Call to static method set\(\) on an unknown class PKP\\core\\Registry\.$#'
+			identifier: class.notFound
+			count: 2
+			path: src/Providers/Ojs/OjsProvider.php
+
+		-
+			message: '#^Instantiated class APP\\core\\Application not found\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Providers/Ojs/OjsProvider.php
+
+		-
+			message: '#^Instantiated class APP\\core\\PageRouter not found\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Providers/Ojs/OjsProvider.php
+
+		-
+			message: '#^Method OjsSdk\\Providers\\Ojs\\OjsProvider\:\:getApplication\(\) has invalid return type APP\\core\\Application\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Providers/Ojs/OjsProvider.php
+
+		-
+			message: '#^Method OjsSdk\\Providers\\Ojs\\OjsProvider\:\:getApplication\(\) should return APP\\core\\Application but empty return statement found\.$#'
+			identifier: return.empty
+			count: 1
+			path: src/Providers/Ojs/OjsProvider.php
+
+		-
+			message: '#^Call to static method encryptCredentials\(\) on an unknown class PKP\\security\\Validation\.$#'
+			identifier: class.notFound
+			count: 2
+			path: src/Services/OJSService/Users/OJSUserService.php
+
+		-
+			message: '#^Call to static method getCurrentDate\(\) on an unknown class PKP\\core\\Core\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Services/OJSService/Users/OJSUserService.php
+
+		-
+			message: '#^Call to static method user\(\) on an unknown class APP\\facades\\Repo\.$#'
+			identifier: class.notFound
+			count: 7
+			path: src/Services/OJSService/Users/OJSUserService.php
+
+		-
+			message: '#^Call to static method userGroup\(\) on an unknown class APP\\facades\\Repo\.$#'
+			identifier: class.notFound
+			count: 2
+			path: src/Services/OJSService/Users/OJSUserService.php
+
+		-
+			message: '#^PHPDoc tag @param references unknown parameter\: \$email$#'
+			identifier: parameter.notFound
+			count: 1
+			path: src/Services/OJSService/Users/OJSUserService.php
+
+		-
+			message: '#^PHPDoc tag @param references unknown parameter\: \$login$#'
+			identifier: parameter.notFound
+			count: 1
+			path: src/Services/OJSService/Users/OJSUserService.php
+
+		-
+			message: '#^PHPDoc tag @param references unknown parameter\: \$nome$#'
+			identifier: parameter.notFound
+			count: 1
+			path: src/Services/OJSService/Users/OJSUserService.php
+
+		-
+			message: '#^PHPDoc tag @param references unknown parameter\: \$senha$#'
+			identifier: parameter.notFound
+			count: 1
+			path: src/Services/OJSService/Users/OJSUserService.php
+
+		-
+			message: '#^PHPDoc tag @param references unknown parameter\: \$sobrenome$#'
+			identifier: parameter.notFound
+			count: 1
+			path: src/Services/OJSService/Users/OJSUserService.php
+
+		-
+			message: '#^Property OjsSdk\\Services\\OJSService\\Users\\OJSUserService\:\:\$ojsBasePath is unused\.$#'
+			identifier: property.unused
+			count: 1
+			path: src/Services/OJSService/Users/OJSUserService.php

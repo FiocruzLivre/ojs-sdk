@@ -1,0 +1,19 @@
+# Trivy policy used in CI (and locally with `trivy fs --config trivy.yaml .`)
+scan:
+  scanners:
+    - vuln      # vulnerabilities in composer.lock
+    - secret    # tokens, passwords and keys left in the code
+    - misconfig # configuration issues in the Dockerfile
+  skip-dirs:
+    - vendor
+    - ojs
+    - .docker/volumes
+
+vulnerability:
+  ignore-unfixed: true
+
+severity:
+  - HIGH
+  - CRITICAL
+
+exit-code: 1
