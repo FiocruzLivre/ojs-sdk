@@ -16,9 +16,9 @@ services:
     links:
       - db
   db:
-    image: mariadb
+    image: mariadb:10.11
     ports:
-      - "3306:3306"
+      - "127.0.0.1:3306:3306"
     volumes:
       -  ./.docker/mysql/conf:/etc/mysql/conf.d
       - ./.docker/volumes/mysql/dump:/docker-entrypoint-initdb.d
