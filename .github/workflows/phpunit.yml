@@ -1,27 +1,70 @@
-name: ci
+name: CI
 
 on:
   pull_request:
   push:
-    branches: [ main ]
+    branches: [main]
+  # Runs every Monday to catch newly disclosed vulnerabilities
+  schedule:
+    - cron: '41 6 * * 1'
+  workflow_dispatch:
+
+# By default the token can only read the repository
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
 
 env:
-  OJS_WEB_BASEDIR: /home/runner/work/ojs-sdk/ojs-sdk/ojs/
+  OJS_WEB_BASEDIR: ${{ github.workspace }}/ojs/
   OJS_LOGIN_URL: http://localhost/ojs/index.php/journal/login/signIn
   TEST_DB_HOST: 127.0.0.1
   TEST_DB_PORT: 3306
 
 jobs:
+  quality:
+    name: Quality (standards, audit and static analysis)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
+        with:
+          php-version: '8.2'
+          tools: composer:v2
+          coverage: none
+
+      - name: Validate composer.json and composer.lock
+        run: composer validate --no-check-publish
+
+      - name: Install dependencies
+        run: composer install --no-interaction --no-progress --prefer-dist
+
+      - name: Dependency audit
+        run: composer audit --abandoned=fail
+
+      - name: Code style (PSR-12)
+        run: composer cs:check
+
+      - name: Static analysis (PHPStan)
+        run: composer phpstan
+
   phpunit:
+    name: PHPUnit (PHP ${{ matrix.php-versions }}, OJS ${{ matrix.server-versions }})
     runs-on: ubuntu-latest
     strategy:
-      # do not stop on another job's failure
       fail-fast: false
       matrix:
         php-versions: ['8.2']
-        databases: ['mysql']
         server-versions: ['3_4_0-10']
-    name: php${{ matrix.php-versions }}-${{ matrix.databases }}-${{ matrix.server-versions }}
+
     services:
       mysql:
         image: mariadb:10.11
@@ -34,28 +77,33 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@master
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Checkout OJS
-        uses: actions/checkout@master
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: pkp/ojs
           ref: ${{ matrix.server-versions }}
           path: ojs
           submodules: true
+          persist-credentials: false
 
-      - name: Set up php ${{ matrix.php-versions }}
-        uses: shivammathur/setup-php@v2
+      - name: Setup PHP ${{ matrix.php-versions }}
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
         with:
           php-version: ${{ matrix.php-versions }}
-          extensions: gettext, intl, mysql, pdo_mysql
+          extensions: gettext, intl, mysqli, pdo_mysql
+          tools: composer:v2
+          coverage: none
 
       - name: Install Composer dependencies
         run: |
-          composer install
-          composer --working-dir=ojs/lib/pkp install
-          composer --working-dir=ojs/plugins/paymethod/paypal install
-          composer --working-dir=ojs/plugins/generic/citationStyleLanguage install
+          composer install --no-interaction --no-progress --prefer-dist
+          composer --working-dir=ojs/lib/pkp install --no-interaction --no-progress --prefer-dist
+          composer --working-dir=ojs/plugins/paymethod/paypal install --no-interaction --no-progress --prefer-dist
+          composer --working-dir=ojs/plugins/generic/citationStyleLanguage install --no-interaction --no-progress --prefer-dist
 
       - name: Install OJS
         run: php tests/setupOjs.php
@@ -63,28 +111,42 @@ jobs:
       - name: PHPUnit
         run: composer unit
 
-  php-cs-fixer:
+  trivy:
+    name: Trivy (vulnerabilities, secrets and configuration)
     runs-on: ubuntu-latest
-    strategy:
-      # do not stop on another job's failure
-      fail-fast: false
-      matrix:
-        php-versions: ['8.2']
-        server-versions: ['3_4_0-10']
-
-    name: php-cs check php${{ matrix.php-versions }}
+    permissions:
+      contents: read
+      security-events: write # needed to upload the result to the Security tab
 
     steps:
       - name: Checkout
-        uses: actions/checkout@master
-
-      - name: Set up php
-        uses: shivammathur/setup-php@master
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          php-version: ${{ matrix.php-versions }}
+          persist-credentials: false
 
-      - name: Install Composer dependencies
-        run: composer install
+      - name: Install Trivy
+        uses: aquasecurity/setup-trivy@81e514348e19b6112ce2a7e3ecbafe19c1e1f567 # v0.3.1
+        with:
+          version: v0.74.0
+          cache: true
 
-      - name: Run coding standards check
-        run: composer cs:check
+      # Only fails CI on exposed secrets or high/critical vulnerabilities
+      # that already have a fix available
+      - name: Blocking scan (vulnerabilities and secrets)
+        run: trivy fs --config trivy.yaml --scanners vuln,secret --format table .
+
+      # Configuration issues (Dockerfile) show up in the log, non-blocking
+      - name: Informational scan (configuration)
+        run: trivy fs --config trivy.yaml --scanners misconfig --exit-code 0 --format table .
+
+      # Full report for the Security tab, never fails
+      - name: Scan (SARIF report)
+        if: always()
+        run: trivy fs --config trivy.yaml --exit-code 0 --format sarif --output trivy-results.sarif .
+
+      - name: Upload result to the Security tab
+        if: always() && github.event_name != 'pull_request'
+        uses: github/codeql-action/upload-sarif@88585263c0627ee42c0e1c5143a112c8d6f4aa18 # v4.38.2
+        with:
+          sarif_file: trivy-results.sarif
+          category: trivy-fs
