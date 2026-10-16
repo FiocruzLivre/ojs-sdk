@@ -1,0 +1,20 @@
+# PHPStan configuration.
+# The first time, generate the baseline (list of pre-existing warnings) with:
+#   vendor/bin/phpstan analyse --generate-baseline
+# then uncomment the "includes" block below. CI then only fails on NEW
+# issues, and the baseline can be whittled down gradually.
+
+includes:
+    - phpstan-baseline.neon
+
+parameters:
+    level: 5
+    paths:
+        - src
+    # OJS's classes (APP\..., PKP\...) only exist inside an OJS install.
+    # If there's a local copy of OJS 3.4 in the "ojs" folder (as created by
+    # docker-compose), uncomment this so PHPStan knows about them. Analysis
+    # gets slower, and CI keeps using the baseline either way.
+    #scanDirectories:
+    #    - ojs/classes
+    #    - ojs/lib/pkp/classes
